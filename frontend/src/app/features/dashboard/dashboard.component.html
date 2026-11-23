@@ -1,0 +1,105 @@
+@if (loading) {
+  <div class="loading"><mat-spinner diameter="40" /></div>
+} @else if (profile) {
+  <section class="hero">
+    <div>
+      <p class="hero__eyebrow">{{ greeting }}</p>
+      <h1 class="hero__title">{{ firstName }}, let's build healthy habits.</h1>
+      @if (weightDirection !== 'none' && weightToGo !== null) {
+        <p class="hero__text">
+          You're <strong>{{ weightToGo }} kg</strong> from your target of {{ profile.targetWeightKg }} kg.
+          Small, consistent steps each day add up - aim for steady progress, not perfection.
+        </p>
+      } @else {
+        <p class="hero__text">You're at your target weight. Focus on consistency, strength and energy.</p>
+      }
+    </div>
+    <a mat-flat-button routerLink="/profile" [queryParams]="{ tab: 'goals' }"><mat-icon>flag</mat-icon> My goals</a>
+  </section>
+
+  <section class="ft-grid stats" aria-label="Key numbers">
+    <ft-stat-card label="Current weight" [value]="profile.currentWeightKg" unit="kg" icon="monitor_weight" tone="primary" />
+    <ft-stat-card label="Target weight" [value]="profile.targetWeightKg" unit="kg" icon="flag" tone="tertiary"
+                  [hint]="weightToGo ? (weightToGo + ' kg to ' + weightDirection) : undefined" />
+    <ft-stat-card label="BMI" [value]="profile.bmi" icon="speed" tone="secondary" [hint]="bmiLabel" />
+    <ft-stat-card label="Age" [value]="profile.age" unit="yrs" icon="cake" tone="neutral" [hint]="profile.heightCm ? profile.heightCm + ' cm tall' : undefined" />
+  </section>
+
+  <div class="columns">
+    <mat-card appearance="outlined" class="ft-card">
+      <div class="card-head">
+        <h2 class="ft-section-title">Your fitness profile</h2>
+        <a mat-button routerLink="/profile" [queryParams]="{ tab: 'assessment' }">Update</a>
+      </div>
+      @if (assessment) {
+        <ul class="facts">
+          <li><mat-icon aria-hidden="true">emoji_events</mat-icon><span>Goal</span><strong>{{ label(goalOpts, assessment.primaryGoal) }}</strong></li>
+          <li><mat-icon aria-hidden="true">signal_cellular_alt</mat-icon><span>Level</span><strong>{{ label(levelOpts, assessment.fitnessLevel) }}</strong></li>
+          <li><mat-icon aria-hidden="true">location_on</mat-icon><span>Location</span><strong>{{ label(locationOpts, assessment.workoutLocation) }}</strong></li>
+          <li><mat-icon aria-hidden="true">calendar_month</mat-icon><span>Training days</span><strong>{{ trainingDays }}</strong></li>
+          <li><mat-icon aria-hidden="true">timer</mat-icon><span>Per session</span><strong>{{ assessment.sessionMinutes }} min</strong></li>
+          <li><mat-icon aria-hidden="true">bedtime</mat-icon><span>Sleep</span><strong>{{ assessment.sleepHours }} h</strong></li>
+        </ul>
+        @if (assessment.limitations.length) {
+          <p class="ft-muted note"><mat-icon inline>healing</mat-icon> We'll keep your {{ assessment.limitations.length }} declared limitation(s) in mind when building workouts.</p>
+        }
+      } @else {
+        <ft-empty-state icon="assignment" title="No assessment yet" message="Complete your fitness assessment to personalise FitTrack." />
+      }
+    </mat-card>
+
+    <mat-card appearance="outlined" class="ft-card">
+      <div class="card-head">
+        <h2 class="ft-section-title">Active goals</h2>
+        <a mat-button routerLink="/profile" [queryParams]="{ tab: 'goals' }">Manage</a>
+      </div>
+      @if (goals.length) {
+        <mat-list>
+          @for (g of goals; track g.id) {
+            <mat-list-item>
+              <mat-icon matListItemIcon aria-hidden="true">{{ goalIcon(g) }}</mat-icon>
+              <span matListItemTitle>{{ g.title }}</span>
+              <span matListItemLine class="ft-muted">
+                Target {{ g.targetValue }} {{ g.unit }}@if (g.targetDate) { · by {{ g.targetDate | date: 'mediumDate' }} }
+              </span>
+            </mat-list-item>
+          }
+        </mat-list>
+      } @else {
+        <ft-empty-state icon="flag" title="No active goals" message="Set a goal for steps, water, sleep or workouts to stay on track." />
+      }
+    </mat-card>
+  </div>
+
+  @if (recs) {
+    <mat-card appearance="outlined" class="ft-card recs">
+      <h2 class="ft-section-title"><mat-icon inline aria-hidden="true">auto_awesome</mat-icon> Your personalised recommendations</h2>
+      <div class="recs__grid">
+        @for (r of recs.items; track r.title) {
+          <div class="rec">
+            <mat-icon class="rec__icon" aria-hidden="true">{{ r.icon }}</mat-icon>
+            <div>
+              <span class="ft-muted small">{{ r.title }}</span>
+              <strong class="rec__value">{{ r.value }}</strong>
+              <p class="rec__why">{{ r.explanation }}</p>
+            </div>
+          </div>
+        }
+      </div>
+      <p class="ft-muted small">{{ recs.disclaimer }}</p>
+    </mat-card>
+  }
+
+  <h2 class="ft-section-title next-title">Today in FitTrack</h2>
+  <section class="ft-grid">
+    @for (u of upcoming; track u.path) {
+      <a class="next" [routerLink]="u.path">
+        <mat-icon aria-hidden="true">{{ u.icon }}</mat-icon>
+        <strong>{{ u.title }}</strong>
+        <span>{{ u.text }}</span>
+      </a>
+    }
+  </section>
+
+  <ft-disclaimer class="disclaimer" />
+}

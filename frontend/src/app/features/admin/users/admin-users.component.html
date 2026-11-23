@@ -1,0 +1,91 @@
+<div class="filters">
+  <mat-form-field appearance="outline" class="search" subscriptSizing="dynamic">
+    <mat-label>Search name or email</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput [formControl]="search" autocomplete="off" />
+  </mat-form-field>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Plan</mat-label>
+    <mat-select [(value)]="plan" (selectionChange)="reload(true)">
+      <mat-option value="">All plans</mat-option>
+      @for (p of plans; track p.code) {
+        <mat-option [value]="p.code">{{ p.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Status</mat-label>
+    <mat-select [(value)]="status" (selectionChange)="reload(true)">
+      <mat-option value="ANY">Any</mat-option>
+      <mat-option value="ENABLED">Enabled</mat-option>
+      <mat-option value="DISABLED">Disabled</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<mat-card appearance="outlined" class="table-card">
+  @if (loading) { <mat-progress-bar mode="indeterminate" /> }
+  <div class="table-wrap">
+    <table mat-table [dataSource]="rows">
+      <ng-container matColumnDef="user">
+        <th mat-header-cell *matHeaderCellDef>User</th>
+        <td mat-cell *matCellDef="let u">
+          <div class="user">
+            <strong>{{ u.fullName || '—' }}</strong>
+            <span class="ft-muted">{{ u.email }}
+              @if (!u.emailVerified) { <mat-icon class="tiny" matTooltip="Email not verified" aria-label="Email not verified">mark_email_unread</mat-icon> }
+            </span>
+          </div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="plan">
+        <th mat-header-cell *matHeaderCellDef>Plan</th>
+        <td mat-cell *matCellDef="let u">
+          <span class="chip" [class.chip--premium]="u.planCode && u.planCode !== 'FREE'">{{ u.planCode ?? '—' }}</span>
+          @if (u.subscriptionStatus === 'TRIALING') { <span class="ft-muted small"> trial</span> }
+          @if (u.periodEnd) { <div class="ft-muted small">until {{ u.periodEnd | date: 'mediumDate' }}</div> }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let u">
+          <span class="dot" [class.dot--off]="!u.enabled"></span>{{ u.enabled ? 'Enabled' : 'Disabled' }}
+          @if (!u.onboardingCompleted) { <div class="ft-muted small">not onboarded</div> }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="joined">
+        <th mat-header-cell *matHeaderCellDef>Joined</th>
+        <td mat-cell *matCellDef="let u">{{ u.createdAt | date: 'mediumDate' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="lastLogin">
+        <th mat-header-cell *matHeaderCellDef>Last sign-in</th>
+        <td mat-cell *matCellDef="let u">{{ u.lastLoginAt ? (u.lastLoginAt | date: 'short') : '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef><span class="cdk-visually-hidden">Actions</span></th>
+        <td mat-cell *matCellDef="let u">
+          <button mat-icon-button [matMenuTriggerFor]="menu" [attr.aria-label]="'Actions for ' + u.email"><mat-icon>more_vert</mat-icon></button>
+          <mat-menu #menu="matMenu" xPosition="before">
+            <button mat-menu-item (click)="view(u)"><mat-icon>visibility</mat-icon>View details</button>
+            <button mat-menu-item (click)="grant(u)"><mat-icon>workspace_premium</mat-icon>Grant / extend plan</button>
+            @if (u.planCode !== 'FREE') {
+              <button mat-menu-item (click)="revoke(u)"><mat-icon>remove_circle</mat-icon>Move to Free</button>
+            }
+            @if (!isSelf(u)) {
+              <button mat-menu-item (click)="toggleEnabled(u)">
+                <mat-icon>{{ u.enabled ? 'block' : 'check_circle' }}</mat-icon>{{ u.enabled ? 'Disable account' : 'Enable account' }}
+              </button>
+            }
+          </mat-menu>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns" [class.row--disabled]="!row.enabled"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell empty" [attr.colspan]="columns.length">{{ loading ? 'Loading…' : 'No users match these filters.' }}</td>
+      </tr>
+    </table>
+  </div>
+  <mat-paginator [length]="total" [pageIndex]="page" [pageSize]="size" [pageSizeOptions]="[10, 20, 50, 100]"
+                 (page)="onPage($event)" aria-label="Select page of users" />
+</mat-card>

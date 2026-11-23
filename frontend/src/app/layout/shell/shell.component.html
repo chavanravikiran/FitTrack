@@ -1,0 +1,110 @@
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<mat-sidenav-container class="shell">
+  <mat-sidenav class="shell__nav" [mode]="isHandset ? 'over' : 'side'" [opened]="!isHandset"
+               [attr.role]="isHandset ? 'dialog' : 'navigation'" aria-label="Main navigation">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true"><mat-icon>bolt</mat-icon></span>
+      <span class="brand__name">FitTrack</span>
+    </div>
+    <mat-nav-list>
+      @for (item of navItems; track item.path) {
+        <a mat-list-item [routerLink]="item.path" routerLinkActive="active-link" #rla="routerLinkActive"
+           [activated]="rla.isActive" [attr.aria-current]="rla.isActive ? 'page' : null">
+          <mat-icon matListItemIcon aria-hidden="true">{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="shell__content">
+    <mat-toolbar class="topbar">
+      @if (isHandset) {
+        <button mat-icon-button (click)="sidenav?.toggle()" aria-label="Open navigation menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span class="topbar__title">FitTrack</span>
+      }
+      <span class="spacer"></span>
+
+      @if (billing.subscription$ | async; as sub) {
+        @if (sub.premium) {
+          <a mat-button routerLink="/billing" class="plan-chip plan-chip--premium"
+             [matTooltip]="sub.status === 'TRIALING' ? 'Premium trial: ' + sub.daysRemaining + ' days left' : 'Premium'">
+            <mat-icon>workspace_premium</mat-icon>
+            @if (!isHandset) { {{ sub.status === 'TRIALING' ? 'Trial · ' + sub.daysRemaining + 'd' : 'Premium' }} }
+          </a>
+        } @else {
+          <a mat-stroked-button routerLink="/billing" class="plan-chip"><mat-icon>bolt</mat-icon> Upgrade</a>
+        }
+      }
+
+      <ft-notification-bell />
+
+      <button mat-icon-button [matMenuTriggerFor]="themeMenu" aria-label="Change theme" matTooltip="Theme">
+        <mat-icon>{{ theme.isDark ? 'dark_mode' : 'light_mode' }}</mat-icon>
+      </button>
+      <mat-menu #themeMenu="matMenu">
+        <button mat-menu-item (click)="setTheme('LIGHT')"><mat-icon>light_mode</mat-icon>Light</button>
+        <button mat-menu-item (click)="setTheme('DARK')"><mat-icon>dark_mode</mat-icon>Dark</button>
+        <button mat-menu-item (click)="setTheme('SYSTEM')"><mat-icon>contrast</mat-icon>Match system</button>
+      </mat-menu>
+
+      @if (auth.user$ | async; as user) {
+        <button mat-button class="user-btn" [matMenuTriggerFor]="userMenu" aria-label="Account menu">
+          <span class="avatar" aria-hidden="true">
+            @if (photoUrl) {
+              <img [src]="photoUrl" alt="" />
+            } @else {
+              {{ initials(user.fullName) }}
+            }
+          </span>
+          @if (!isHandset) {
+            <span class="user-btn__name">{{ user.fullName }}</span>
+          }
+        </button>
+        <mat-menu #userMenu="matMenu" xPosition="before">
+          <div class="menu-header" mat-menu-item disabled>
+            <span>{{ user.email }}</span>
+          </div>
+          <a mat-menu-item routerLink="/profile"><mat-icon>person</mat-icon>My profile</a>
+          <a mat-menu-item routerLink="/profile" [queryParams]="{ tab: 'assessment' }"><mat-icon>assignment</mat-icon>Fitness assessment</a>
+          <a mat-menu-item routerLink="/billing"><mat-icon>workspace_premium</mat-icon>Subscription</a>
+          @if (auth.isAdmin()) {
+            <a mat-menu-item routerLink="/admin"><mat-icon>admin_panel_settings</mat-icon>Admin panel</a>
+          }
+          <mat-divider />
+          <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon>Sign out</button>
+        </mat-menu>
+      }
+    </mat-toolbar>
+
+    @if (auth.user$ | async; as u) {
+      @if (!u.emailVerified && !verifyBannerDismissed) {
+        <div class="verify-banner" role="status">
+          <mat-icon aria-hidden="true">mark_email_unread</mat-icon>
+          <span>Please confirm your email address - we sent a link to <strong>{{ u.email }}</strong>.</span>
+          <button mat-button type="button" (click)="resendVerification()" [disabled]="resending">Resend</button>
+          <button mat-icon-button type="button" (click)="verifyBannerDismissed = true" aria-label="Dismiss"><mat-icon>close</mat-icon></button>
+        </div>
+      }
+    }
+
+    <main id="main-content" class="page" tabindex="-1">
+      <router-outlet />
+    </main>
+
+    @if (isHandset) {
+      <nav class="bottom-nav" aria-label="Quick navigation">
+        @for (item of primaryItems; track item.path) {
+          <a [routerLink]="item.path" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item"
+             #rla="routerLinkActive" [attr.aria-current]="rla.isActive ? 'page' : null">
+            <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+            <span>{{ item.label.replace('My ', '') }}</span>
+          </a>
+        }
+      </nav>
+    }
+  </mat-sidenav-content>
+</mat-sidenav-container>

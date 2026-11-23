@@ -1,0 +1,100 @@
+<ft-page-header title="Nutrition" icon="restaurant" subtitle="Log meals, see calories and macros, and get food ideas that fit your diet.">
+  <div class="date-nav">
+    <button mat-icon-button (click)="shift(-1)" aria-label="Previous day"><mat-icon>chevron_left</mat-icon></button>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="date-field">
+      <input matInput [matDatepicker]="dp" [ngModel]="date" (ngModelChange)="onDate($event)" [max]="maxDate" aria-label="Date" />
+      <mat-datepicker-toggle matIconSuffix [for]="dp" />
+      <mat-datepicker #dp />
+    </mat-form-field>
+    <button mat-icon-button (click)="shift(1)" aria-label="Next day"><mat-icon>chevron_right</mat-icon></button>
+  </div>
+</ft-page-header>
+
+@if (day) {
+  <section class="totals">
+    <mat-card appearance="outlined" class="ft-card kcal">
+      <ft-progress-ring [percent]="pct(day.totals.calories, day.targets?.calories)" label="Calories toward today's estimate" [size]="150">
+        <span class="big">{{ day.totals.calories }}</span>
+        <span class="ft-muted small">@if (day.targets) { of ~{{ day.targets.calories }} } kcal</span>
+      </ft-progress-ring>
+      <div class="macros">
+        @for (m of [
+          { label: 'Protein', value: day.totals.proteinG, target: day.targets?.proteinG },
+          { label: 'Carbs', value: day.totals.carbsG, target: day.targets?.carbsG },
+          { label: 'Fat', value: day.totals.fatG, target: day.targets?.fatG }
+        ]; track m.label) {
+          <div class="macro">
+            <div class="macro__row"><span>{{ m.label }}</span><strong>{{ m.value }} g @if (m.target) { <span class="ft-muted">/ {{ m.target }} g</span> }</strong></div>
+            <mat-progress-bar mode="determinate" [value]="pct(m.value, m.target)" [attr.aria-label]="m.label + ' progress'" />
+          </div>
+        }
+      </div>
+    </mat-card>
+    <mat-card appearance="outlined" class="ft-card">
+      <h2 class="ft-section-title">Last 7 days</h2>
+      <ft-bar-chart [data]="chart" unit="kcal" ariaLabel="Calories per day" />
+      @for (i of day.insights; track i) { <p class="insight"><mat-icon inline aria-hidden="true">lightbulb</mat-icon> {{ i }}</p> }
+    </mat-card>
+  </section>
+
+  <div class="layout">
+    <div class="meals">
+      @for (type of mealTypes; track type) {
+        <mat-card appearance="outlined" class="meal">
+          <div class="meal__head">
+            <mat-icon class="meal__icon" aria-hidden="true">{{ meals[type].icon }}</mat-icon>
+            <h3>{{ meals[type].label }}</h3>
+            <span class="ft-muted">{{ mealOf(type)?.totals?.calories ?? 0 }} kcal</span>
+            <span class="spacer"></span>
+            <button mat-stroked-button (click)="add(type)"><mat-icon>add</mat-icon> Add food</button>
+          </div>
+          @if (mealOf(type)?.items?.length) {
+            <ul class="items">
+              @for (it of mealOf(type)!.items; track it.id) {
+                <li>
+                  <div class="item__body">
+                    <strong>{{ it.foodName }}</strong>
+                    <span class="ft-muted small">{{ it.servings }} × {{ it.servingQty }} {{ it.servingUnit }} · {{ it.calories | number: '1.0-0' }} kcal · P {{ it.proteinG | number: '1.0-0' }} · C {{ it.carbsG | number: '1.0-0' }} · F {{ it.fatG | number: '1.0-0' }} g</span>
+                  </div>
+                  <div class="stepper">
+                    <button mat-icon-button (click)="changeServings(it, -0.5)" [disabled]="it.servings <= 0.5" [attr.aria-label]="'Less ' + it.foodName"><mat-icon>remove</mat-icon></button>
+                    <button mat-icon-button (click)="changeServings(it, 0.5)" [attr.aria-label]="'More ' + it.foodName"><mat-icon>add</mat-icon></button>
+                    <button mat-icon-button (click)="remove(it)" [attr.aria-label]="'Remove ' + it.foodName"><mat-icon>delete</mat-icon></button>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="ft-muted empty">Nothing logged yet.</p>
+          }
+        </mat-card>
+      }
+    </div>
+
+    <mat-card appearance="outlined" class="ft-card suggest">
+      <h2 class="ft-section-title">Ideas for you</h2>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="ft-full-width">
+        <mat-label>Meal</mat-label>
+        <mat-select [(value)]="suggestionMeal" (selectionChange)="loadSuggestions()">
+          @for (t of mealTypes; track t) { <mat-option [value]="t">{{ meals[t].label }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+      <p class="ft-muted small">Matched to your diet preference, avoiding the allergies in your assessment.</p>
+      <ul class="sugg">
+        @for (s of suggestions; track s.food.id) {
+          <li>
+            <div class="item__body">
+              <strong>{{ s.food.name }}</strong>
+              <span class="ft-muted small">{{ s.food.servingQty }} {{ s.food.servingUnit }} · {{ s.food.calories | number: '1.0-0' }} kcal · {{ s.reason }}</span>
+            </div>
+            <button mat-icon-button (click)="addSuggestion(s)" [attr.aria-label]="'Add ' + s.food.name"><mat-icon>add_circle</mat-icon></button>
+          </li>
+        }
+      </ul>
+    </mat-card>
+  </div>
+
+  <ft-disclaimer [custom]="true" class="disclaimer">{{ day.disclaimer }}</ft-disclaimer>
+} @else {
+  <mat-progress-bar mode="indeterminate" />
+}

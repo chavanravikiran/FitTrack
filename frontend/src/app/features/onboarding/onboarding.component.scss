@@ -1,0 +1,41 @@
+.onboarding { max-width: 860px; margin: 0 auto; padding: 16px 16px 48px; }
+.top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.logo { display: flex; align-items: center; gap: 8px; font: var(--mat-sys-title-large); font-weight: 700; color: var(--mat-sys-primary); }
+
+.intro h1 { margin: 16px 0 6px; font: var(--mat-sys-headline-small); font-weight: 700; }
+.intro p { margin: 0 0 20px; color: var(--mat-sys-on-surface-variant); max-width: 60ch; }
+
+.card { border-radius: 24px; padding: 8px 0; }
+.stepper { background: transparent; }
+.step { padding-top: 8px; }
+
+.actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+.field-label { font: var(--mat-sys-title-small); margin: 8px 0 6px; display: block; }
+.radio-row { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.help { margin: 6px 0 0; font: var(--mat-sys-body-small); color: var(--mat-sys-on-surface-variant); }
+.help.block { display: block; margin-top: 6px; }
+
+.body-grid { display: grid; grid-template-columns: 1fr; column-gap: 16px; }
+@media (min-width: 720px) { .body-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.insight {
+  display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 16px; margin-top: 8px;
+  background: var(--mat-sys-secondary-container); color: var(--mat-sys-on-secondary-container);
+  font: var(--mat-sys-body-medium);
+}
+
+.review {
+  display: grid; grid-template-columns: 1fr; gap: 0; margin: 0 0 16px;
+  border: 1px solid var(--mat-sys-outline-variant); border-radius: 16px; overflow: hidden;
+}
+@media (min-width: 720px) { .review { grid-template-columns: 1fr 1fr; } }
+.review > div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--mat-sys-outline-variant); }
+.review dt { color: var(--mat-sys-on-surface-variant); font: var(--mat-sys-body-medium); }
+.review dd { margin: 0; font: var(--mat-sys-body-medium); font-weight: 600; text-align: right; }
+
+.ack { display: block; margin-top: 12px; }
+.error {
+  display: flex; gap: 8px; margin-top: 12px; padding: 12px; border-radius: 12px;
+  background: var(--mat-sys-error-container); color: var(--mat-sys-on-error-container);
+}

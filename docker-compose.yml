@@ -1,0 +1,34 @@
+# Local development services. Start with:  docker compose up -d
+# The backend's default DB_URL points at localhost:5434 (this container),
+# so it never clashes with a local PostgreSQL on 5432 or other containers on 5433.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fittrack-postgres
+    environment:
+      POSTGRES_DB: fittrack
+      POSTGRES_USER: fittrack
+      POSTGRES_PASSWORD: fittrack
+      TZ: UTC
+    ports:
+      - "5434:5432"
+    volumes:
+      - fittrack-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fittrack -d fittrack"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Optional: catches password-reset emails. UI at http://localhost:8025
+  # Start with: docker compose --profile mail up -d   and run the backend with MAIL_ENABLED=true
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: fittrack-mailhog
+    profiles: ["mail"]
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  fittrack-pgdata:

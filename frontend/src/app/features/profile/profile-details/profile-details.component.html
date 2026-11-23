@@ -1,0 +1,98 @@
+@if (profile) {
+  <div class="layout">
+    <mat-card appearance="outlined" class="ft-card photo-card">
+      <div class="avatar" [class.avatar--empty]="!photoUrl">
+        @if (photoUrl) {
+          <img [src]="photoUrl" [alt]="profile.fullName + ' profile photo'" />
+        } @else {
+          <mat-icon aria-hidden="true">person</mat-icon>
+        }
+        @if (uploading) {
+          <div class="avatar__busy"><mat-spinner diameter="32" /></div>
+        }
+      </div>
+      <h2 class="name">{{ profile.fullName }}</h2>
+      <p class="ft-muted email">{{ profile.email }}</p>
+      <p class="ft-muted since">Member since {{ profile.memberSince | date: 'mediumDate' }}</p>
+
+      <input #fileInput type="file" accept="image/jpeg,image/png" hidden (change)="onFileSelected($event)" />
+      <div class="photo-actions">
+        <button mat-stroked-button type="button" (click)="fileInput.click()" [disabled]="uploading">
+          <mat-icon>photo_camera</mat-icon> {{ profile.hasPhoto ? 'Change photo' : 'Add photo' }}
+        </button>
+        @if (profile.hasPhoto) {
+          <button mat-button type="button" (click)="removePhoto()">Remove</button>
+        }
+      </div>
+      <p class="ft-muted tiny">JPEG or PNG, up to 5 MB. Location data is removed automatically.</p>
+    </mat-card>
+
+    <mat-card appearance="outlined" class="ft-card">
+      <h2 class="ft-section-title">Personal details</h2>
+      @if (error) {
+        <div class="alert" role="alert"><mat-icon>error</mat-icon> {{ error }}</div>
+      }
+      <form [formGroup]="form" (ngSubmit)="save()" class="ft-form" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Full name</mat-label>
+          <input matInput formControlName="fullName" autocomplete="name" />
+          <mat-error>{{ form.controls.fullName | formError: 'Full name' }}</mat-error>
+        </mat-form-field>
+
+        <div class="ft-form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Date of birth</mat-label>
+            <input matInput [matDatepicker]="dob" formControlName="dateOfBirth" [max]="maxDob" />
+            <mat-datepicker-toggle matIconSuffix [for]="dob" />
+            <mat-datepicker #dob startView="multi-year" />
+            <mat-hint>Age: {{ profile.age ?? '—' }}</mat-hint>
+            <mat-error>{{ form.controls.dateOfBirth | formError: 'Date of birth' }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Gender</mat-label>
+            <mat-select formControlName="gender">
+              @for (g of genders; track g.value) {
+                <mat-option [value]="g.value">{{ g.label }}</mat-option>
+              }
+            </mat-select>
+            <mat-hint>Only used for the BMR estimate</mat-hint>
+            <mat-error>{{ form.controls.gender | formError: 'Gender' }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Height</mat-label>
+            <input matInput type="number" formControlName="heightCm" inputmode="decimal" />
+            <span matTextSuffix>cm</span>
+            <mat-error>{{ form.controls.heightCm | formError: 'Height' }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Time zone</mat-label>
+            <mat-select formControlName="timeZone">
+              @for (z of timeZones; track z) {
+                <mat-option [value]="z">{{ z }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <label class="label" id="theme-label">Appearance</label>
+        <mat-button-toggle-group formControlName="theme" aria-labelledby="theme-label" class="theme-toggle">
+          <mat-button-toggle value="LIGHT"><mat-icon>light_mode</mat-icon> Light</mat-button-toggle>
+          <mat-button-toggle value="DARK"><mat-icon>dark_mode</mat-icon> Dark</mat-button-toggle>
+          <mat-button-toggle value="SYSTEM"><mat-icon>contrast</mat-icon> System</mat-button-toggle>
+        </mat-button-toggle-group>
+
+        <div class="actions">
+          <button mat-flat-button type="submit" [disabled]="saving || form.pristine">
+            @if (saving) { <mat-spinner diameter="20" /> } @else { Save changes }
+          </button>
+        </div>
+      </form>
+      <p class="ft-muted tiny">To update your weight, use the Progress section (coming in Phase 6). Your target weight is managed under Goals.</p>
+    </mat-card>
+  </div>
+} @else {
+  <mat-progress-bar mode="indeterminate" />
+}

@@ -1,0 +1,131 @@
+@if (loading) {
+  <mat-progress-bar mode="indeterminate" />
+} @else if (error) {
+  <mat-card appearance="outlined" class="ft-card">
+    <ft-empty-state icon="assignment" title="We couldn't build your workout" [message]="error">
+      <a mat-flat-button routerLink="/profile" [queryParams]="{ tab: 'assessment' }">Check my assessment</a>
+    </ft-empty-state>
+  </mat-card>
+} @else if (day) {
+  <section class="head" [class.head--rest]="day.restDay">
+    <div>
+      <p class="eyebrow">{{ day.date === today ? 'Today' : (day.date | date: 'EEEE, d MMM') }}</p>
+      <h2>{{ day.title }}</h2>
+      @if (day.focus) { <p class="focus">{{ day.focus }}</p> }
+      <div class="meta">
+        <span class="badge" [class]="'badge--' + status[day.status].tone"><mat-icon aria-hidden="true">{{ status[day.status].icon }}</mat-icon>{{ status[day.status].label }}</span>
+        @if (!day.restDay) {
+          <span class="ft-muted"><mat-icon inline aria-hidden="true">timer</mat-icon> ~{{ day.estimatedMinutes }} min</span>
+          <span class="ft-muted">{{ cards.length }} exercises</span>
+        }
+        @if (day.caloriesEst) { <span class="ft-muted">~{{ day.caloriesEst }} kcal (estimate)</span> }
+      </div>
+    </div>
+    <div class="actions">
+      @if (canStart) {
+        <button mat-flat-button (click)="start()" [disabled]="busy"><mat-icon>play_arrow</mat-icon> Start workout</button>
+      }
+      @if (inProgress) {
+        <button mat-flat-button (click)="finish()" [disabled]="busy"><mat-icon>flag</mat-icon> Finish workout</button>
+      }
+      @if (!day.restDay && (day.status === 'SCHEDULED' || day.status === 'MISSED')) {
+        <button mat-stroked-button [matMenuTriggerFor]="more"><mat-icon>more_horiz</mat-icon> More</button>
+        <mat-menu #more="matMenu">
+          <button mat-menu-item (click)="reschedule()"><mat-icon>event_repeat</mat-icon>Move to another day</button>
+          <button mat-menu-item (click)="skip()"><mat-icon>do_not_disturb_on</mat-icon>Skip this workout</button>
+        </mat-menu>
+      }
+    </div>
+  </section>
+
+  @if (day.recoveryNote) {
+    <div class="note note--warn" role="status"><mat-icon aria-hidden="true">bedtime</mat-icon>{{ day.recoveryNote }}</div>
+  }
+
+  @if (day.restDay) {
+    <mat-card appearance="outlined" class="ft-card">
+      <ft-empty-state icon="self_improvement" title="Rest & recovery day"
+        message="Muscles repair and get stronger on rest days. A relaxed walk, light stretching and good sleep are perfect today.">
+        <a mat-stroked-button routerLink="/videos" [queryParams]="{ category: 'STRETCHING' }"><mat-icon>spa</mat-icon> Stretching videos</a>
+      </ft-empty-state>
+    </mat-card>
+  } @else {
+    @if (inProgress) {
+      <div class="progress">
+        <mat-progress-bar mode="determinate" [value]="progress" aria-label="Sets completed" />
+        <span>{{ progress }}% of sets done</span>
+      </div>
+    } @else if (day.status === 'COMPLETED') {
+      <div class="note note--done" role="status"><mat-icon aria-hidden="true">emoji_events</mat-icon>
+        Workout complete{{ day.perceivedEffort ? ' · effort ' + day.perceivedEffort + '/10' : '' }}. Rest well and stay hydrated!
+      </div>
+    } @else if (day.status === 'SKIPPED' || day.status === 'RESCHEDULED') {
+      <div class="note" role="status"><mat-icon aria-hidden="true">info</mat-icon>
+        This workout was {{ day.status === 'SKIPPED' ? 'skipped' : 'moved' }}. You can still start it if you change your mind.
+      </div>
+    } @else if (!inProgress) {
+      <div class="note" role="status"><mat-icon aria-hidden="true">tips_and_updates</mat-icon>
+        Start with 5 minutes of warm-up (marching, arm circles, bodyweight squats). Tap an exercise name to see how to do it safely.
+      </div>
+    }
+
+    <div class="cards">
+      @for (card of cards; track card.source.planExerciseId ?? card.exercise.id; let i = $index) {
+        <mat-card appearance="outlined" class="ex">
+          <div class="ex__head">
+            <span class="ex__num" aria-hidden="true">{{ i + 1 }}</span>
+            <div class="ex__title">
+              <button class="link" type="button" (click)="info(card.exercise)">{{ card.exercise.name }} <mat-icon inline>info</mat-icon></button>
+              <span class="ft-muted small">
+                {{ target(card.source) }} · rest {{ card.source.restSec }}s
+                @if (card.source.targetRpe) { · effort {{ card.source.targetRpe }}/10 }
+              </span>
+              @if (card.substituteFor) { <span class="sub">Instead of {{ card.substituteFor }}</span> }
+            </div>
+            @if (editable) {
+              <button mat-icon-button type="button" (click)="substitute(card)" matTooltip="Use an alternative today" aria-label="Use an alternative exercise"><mat-icon>swap_horiz</mat-icon></button>
+            }
+          </div>
+          @if (card.source.notes) { <p class="why"><mat-icon inline aria-hidden="true">lightbulb</mat-icon> {{ card.source.notes }}</p> }
+          @if (card.source.progressionTip) { <p class="tip"><mat-icon inline aria-hidden="true">trending_up</mat-icon> {{ card.source.progressionTip }}</p> }
+
+          @if (editable) {
+            <div class="sets">
+              @for (row of card.rows; track row.setNumber) {
+                <div class="set" [class.set--done]="row.done">
+                  <span class="set__n">Set {{ row.setNumber }}</span>
+                  @if (card.timed) {
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="num">
+                      <mat-label>Seconds</mat-label>
+                      <input matInput type="number" min="0" max="7200" [(ngModel)]="row.seconds" (ngModelChange)="card.dirty = true" />
+                    </mat-form-field>
+                  } @else {
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="num">
+                      <mat-label>Reps</mat-label>
+                      <input matInput type="number" min="0" max="500" [(ngModel)]="row.reps" (ngModelChange)="card.dirty = true" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="num">
+                      <mat-label>kg</mat-label>
+                      <input matInput type="number" min="0" max="500" step="0.5" [(ngModel)]="row.weight" (ngModelChange)="card.dirty = true" placeholder="-" />
+                    </mat-form-field>
+                  }
+                  <button mat-icon-button type="button" (click)="toggleDone(card, row)" [attr.aria-pressed]="row.done"
+                          [attr.aria-label]="(row.done ? 'Mark set ' : 'Complete set ') + row.setNumber" class="check">
+                    <mat-icon>{{ row.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+            <div class="ex__foot">
+              <button mat-button type="button" (click)="addSet(card)"><mat-icon>add</mat-icon> Add set</button>
+              @if (card.dirty) {
+                <button mat-stroked-button type="button" (click)="save(card)" [disabled]="card.saving">Save</button>
+              }
+            </div>
+          }
+        </mat-card>
+      }
+    </div>
+    <ft-disclaimer class="disclaimer" />
+  }
+}

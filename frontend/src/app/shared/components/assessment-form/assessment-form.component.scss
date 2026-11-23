@@ -1,0 +1,47 @@
+.block { display: flex; flex-direction: column; gap: 4px; }
+.block + .block { margin-top: 24px; }
+.block__title { margin: 16px 0 8px; font: var(--mat-sys-title-small); font-weight: 600; }
+.block__title:first-child { margin-top: 0; }
+.block__hint { margin: -4px 0 10px; font: var(--mat-sys-body-small); color: var(--mat-sys-on-surface-variant); }
+.block__meta { margin: 6px 0 12px; font: var(--mat-sys-body-small); color: var(--mat-sys-on-surface-variant); }
+
+.choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 720px) {
+  .choice-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .choice-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.choice {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left;
+  padding: 14px; border-radius: 16px; cursor: pointer; font: inherit; color: inherit;
+  border: 1px solid var(--mat-sys-outline-variant); background: var(--mat-sys-surface-container-low);
+  transition: border-color .15s, background-color .15s, box-shadow .15s;
+
+  mat-icon { color: var(--mat-sys-primary); }
+  &:hover { background: var(--mat-sys-surface-container); }
+  &:focus-visible { outline: 2px solid var(--mat-sys-primary); outline-offset: 2px; }
+}
+.choice--selected {
+  border-color: var(--mat-sys-primary); background: var(--mat-sys-primary-container); color: var(--mat-sys-on-primary-container);
+  box-shadow: inset 0 0 0 1px var(--mat-sys-primary);
+}
+.choice__label { font: var(--mat-sys-title-small); font-weight: 600; }
+.choice__hint { font: var(--mat-sys-body-small); opacity: .85; }
+
+.toggle-full { width: 100%; display: flex; }
+.toggle-full mat-button-toggle { flex: 1; }
+.toggle-full mat-icon { vertical-align: middle; margin-right: 4px; }
+
+.chips { margin-bottom: 4px; }
+.field { margin-top: 12px; max-width: 320px; }
+.field-full { width: 100%; }
+.notes { margin-top: 16px; }
+.inline-error { font: var(--mat-sys-body-small); margin-top: 4px; }
+.option-hint { color: var(--mat-sys-on-surface-variant); font-size: .85em; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr; column-gap: 16px; }
+@media (min-width: 720px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+
+.limitations { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+.limitation { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: start; }
+.limitation button { margin-top: 8px; }

@@ -1,0 +1,79 @@
+@use '@angular/material' as mat;
+
+// ---------------------------------------------------------------------------
+// Theme: Material 3. `color-scheme` drives CSS light-dark(), so light, dark and
+// "match system" are a class swap on <html> (see ThemeService) - no rebuild needed.
+// ---------------------------------------------------------------------------
+html {
+  color-scheme: light dark;
+  @include mat.theme((
+    color: (
+      primary: mat.$green-palette,
+      tertiary: mat.$cyan-palette,
+    ),
+    typography: (
+      plain-family: 'Inter, Roboto, system-ui, sans-serif',
+      brand-family: 'Inter, Roboto, system-ui, sans-serif',
+    ),
+    density: 0,
+  ));
+}
+
+html.theme-light { color-scheme: light; }
+html.theme-dark { color-scheme: dark; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  -webkit-font-smoothing: antialiased;
+}
+
+.material-symbols-rounded {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+a { color: var(--mat-sys-primary); }
+
+// ---- Layout helpers -------------------------------------------------------
+.ft-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.ft-stack { display: flex; flex-direction: column; gap: 16px; }
+.ft-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.ft-spacer { flex: 1; }
+.ft-muted { color: var(--mat-sys-on-surface-variant); }
+.ft-full-width { width: 100%; }
+.ft-section-title { font: var(--mat-sys-title-medium); font-weight: 600; margin: 0 0 12px; }
+
+mat-card.ft-card { padding: 20px; border-radius: 20px; }
+
+// Form fields stack vertically and fill their container on small screens.
+.ft-form { display: flex; flex-direction: column; }
+.ft-form mat-form-field { width: 100%; }
+.ft-form-grid { display: grid; grid-template-columns: 1fr; column-gap: 16px; }
+@media (min-width: 720px) {
+  .ft-form-grid { grid-template-columns: 1fr 1fr; }
+}
+
+// ---- Snackbars --------------------------------------------------------------
+.ft-snack-error {
+  --mat-snack-bar-container-color: var(--mat-sys-error-container);
+  --mat-snack-bar-supporting-text-color: var(--mat-sys-on-error-container);
+  --mat-snack-bar-button-color: var(--mat-sys-on-error-container);
+}
+.ft-snack-success {
+  --mat-snack-bar-container-color: var(--mat-sys-primary-container);
+  --mat-snack-bar-supporting-text-color: var(--mat-sys-on-primary-container);
+  --mat-snack-bar-button-color: var(--mat-sys-on-primary-container);
+}
+
+// Respect reduced-motion preferences.
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

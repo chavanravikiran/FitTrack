@@ -1,0 +1,173 @@
+<div [formGroup]="form" class="assessment">
+  @if (show('goals')) {
+    <section class="block">
+      <h3 class="block__title" id="goal-label">What is your main goal?</h3>
+      <div class="choice-grid" role="radiogroup" aria-labelledby="goal-label">
+        @for (o of goals; track o.value) {
+          <button type="button" class="choice" role="radio"
+                  [attr.aria-checked]="form.controls.primaryGoal.value === o.value"
+                  [class.choice--selected]="form.controls.primaryGoal.value === o.value"
+                  (click)="form.controls.primaryGoal.setValue(o.value); form.controls.primaryGoal.markAsTouched()">
+            <mat-icon aria-hidden="true">{{ o.icon }}</mat-icon>
+            <span class="choice__label">{{ o.label }}</span>
+            <span class="choice__hint">{{ o.hint }}</span>
+          </button>
+        }
+      </div>
+      @if (form.controls.primaryGoal.touched && form.controls.primaryGoal.invalid) {
+        <mat-error class="inline-error">Please choose a goal</mat-error>
+      }
+
+      <h3 class="block__title" id="level-label">How experienced are you?</h3>
+      <div class="choice-grid choice-grid--3" role="radiogroup" aria-labelledby="level-label">
+        @for (o of levels; track o.value) {
+          <button type="button" class="choice" role="radio"
+                  [attr.aria-checked]="form.controls.fitnessLevel.value === o.value"
+                  [class.choice--selected]="form.controls.fitnessLevel.value === o.value"
+                  (click)="form.controls.fitnessLevel.setValue(o.value)">
+            <mat-icon aria-hidden="true">{{ o.icon }}</mat-icon>
+            <span class="choice__label">{{ o.label }}</span>
+            <span class="choice__hint">{{ o.hint }}</span>
+          </button>
+        }
+      </div>
+
+      <h3 class="block__title">Where will you work out?</h3>
+      <mat-button-toggle-group formControlName="workoutLocation" aria-label="Workout location" class="toggle-full">
+        @for (o of locations; track o.value) {
+          <mat-button-toggle [value]="o.value"><mat-icon aria-hidden="true">{{ o.icon }}</mat-icon> {{ o.label }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+    </section>
+  }
+
+  @if (show('schedule')) {
+    <section class="block">
+      <h3 class="block__title">Which days can you train?</h3>
+      <p class="block__hint">Pick the days that realistically fit your week. Rest days are just as important as training days.</p>
+      <mat-chip-listbox formControlName="availableDays" [multiple]="true" aria-label="Available workout days" class="chips">
+        @for (d of days; track d.value) {
+          <mat-chip-option [value]="d.value">{{ d.label }}</mat-chip-option>
+        }
+      </mat-chip-listbox>
+      @if (form.controls.availableDays.invalid) {
+        <mat-error class="inline-error">Select at least one day</mat-error>
+      } @else {
+        <p class="block__meta">{{ daysPerWeek }} day{{ daysPerWeek === 1 ? '' : 's' }} per week
+          @if (daysPerWeek >= 6 && form.controls.fitnessLevel.value === 'BEGINNER') {
+            · We'll still schedule rest days so your body can recover.
+          }
+        </p>
+      }
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Time per workout</mat-label>
+        <mat-select formControlName="sessionMinutes">
+          @for (m of minutes; track m) {
+            <mat-option [value]="m">{{ m }} minutes</mat-option>
+          }
+        </mat-select>
+        <mat-error>{{ form.controls.sessionMinutes | formError: 'Duration' }}</mat-error>
+      </mat-form-field>
+
+      <h3 class="block__title">What equipment do you have?</h3>
+      <p class="block__hint">Leave everything unselected if you'll use bodyweight only - that works great for beginners.</p>
+      @if (equipment$ | async; as equipment) {
+        <mat-chip-listbox formControlName="equipmentCodes" [multiple]="true" aria-label="Available equipment" class="chips">
+          @for (e of equipment; track e.code) {
+            <mat-chip-option [value]="e.code">{{ e.name }}</mat-chip-option>
+          }
+        </mat-chip-listbox>
+      } @else {
+        <mat-progress-bar mode="indeterminate" />
+      }
+    </section>
+  }
+
+  @if (show('health')) {
+    <section class="block">
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Daily activity (outside workouts)</mat-label>
+          <mat-select formControlName="activityLevel">
+            @for (o of activities; track o.value) {
+              <mat-option [value]="o.value">{{ o.label }} <span class="option-hint">- {{ o.hint }}</span></mat-option>
+            }
+          </mat-select>
+          <mat-error>{{ form.controls.activityLevel | formError: 'Activity level' }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Average sleep</mat-label>
+          <input matInput type="number" formControlName="sleepHours" min="3" max="14" step="0.5" inputmode="decimal" />
+          <span matTextSuffix>hours</span>
+          <mat-error>{{ form.controls.sleepHours | formError: 'Sleep' }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Diet preference</mat-label>
+          <mat-select formControlName="dietPreference">
+            @for (o of diets; track o.value) {
+              <mat-option [value]="o.value">{{ o.label }}</mat-option>
+            }
+          </mat-select>
+          <mat-error>{{ form.controls.dietPreference | formError: 'Diet preference' }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Food allergies (optional)</mat-label>
+          <input matInput formControlName="allergies" placeholder="e.g. peanuts, lactose" />
+          <mat-error>{{ form.controls.allergies | formError: 'Allergies' }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="field-full">
+        <mat-label>Other dietary restrictions (optional)</mat-label>
+        <input matInput formControlName="dietaryRestrictions" placeholder="e.g. no onion/garlic, Jain, fasting days" />
+        <mat-error>{{ form.controls.dietaryRestrictions | formError: 'Restrictions' }}</mat-error>
+      </mat-form-field>
+
+      <h3 class="block__title">Any injuries or exercise limitations?</h3>
+      <p class="block__hint">We'll avoid or swap exercises that load these areas. This is not a diagnosis - please follow your doctor's or physiotherapist's advice.</p>
+
+      <div formArrayName="limitations" class="limitations">
+        @for (row of limitations.controls; track row; let i = $index) {
+          <div class="limitation" [formGroupName]="i">
+            <mat-form-field appearance="outline">
+              <mat-label>Body area</mat-label>
+              <mat-select formControlName="bodyArea">
+                @for (o of bodyAreas; track o.value) {
+                  <mat-option [value]="o.value" [disabled]="isAreaTaken(o.value, i)">{{ o.label }}</mat-option>
+                }
+              </mat-select>
+              <mat-error>{{ row.controls.bodyArea | formError: 'Body area' }}</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Severity</mat-label>
+              <mat-select formControlName="severity">
+                @for (o of severities; track o.value) {
+                  <mat-option [value]="o.value">{{ o.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <button mat-icon-button type="button" (click)="removeLimitation(i)" [attr.aria-label]="'Remove limitation ' + (i + 1)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+      @if (limitations.length < bodyAreas.length) {
+        <button mat-stroked-button type="button" (click)="addLimitation()">
+          <mat-icon>add</mat-icon> Add a limitation
+        </button>
+      }
+
+      <mat-form-field appearance="outline" class="field-full notes">
+        <mat-label>Notes for your plan (optional)</mat-label>
+        <textarea matInput formControlName="injuryNotes" rows="2" placeholder="e.g. recovering from knee surgery in 2024, avoid jumping"></textarea>
+        <mat-hint align="end">{{ form.controls.injuryNotes.value?.length ?? 0 }}/1000</mat-hint>
+        <mat-error>{{ form.controls.injuryNotes | formError: 'Notes' }}</mat-error>
+      </mat-form-field>
+    </section>
+  }
+</div>

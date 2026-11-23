@@ -1,0 +1,119 @@
+<article class="legal">
+  @if (draft) {
+    <aside class="draft" role="note">
+      <mat-icon aria-hidden="true">gavel</mat-icon>
+      Development build: this document is a template. Have it reviewed by a qualified lawyer and replace the contact
+      details before launching publicly.
+    </aside>
+  }
+
+  @if (doc === 'terms') {
+    <h1>Terms of Service</h1>
+    <p class="ft-muted">Last updated: {{ updated }}</p>
+
+    <h2>1. About FitTrack</h2>
+    <p>FitTrack ("we", "us") provides an online service for planning workouts and tracking fitness habits such as
+      activity, water intake, sleep, body measurements and nutrition. By creating an account you agree to these Terms.</p>
+
+    <h2>2. Not medical advice</h2>
+    <p>FitTrack provides general fitness education and estimates only. It does not diagnose, treat or prevent any
+      medical condition and is not a substitute for advice from a doctor, physiotherapist or registered dietitian.
+      Calorie, BMI, BMR and similar values are approximations. Results vary and are never guaranteed. Stop exercising and
+      seek medical help if you feel pain, dizziness, shortness of breath or chest discomfort. Consult a professional
+      before starting if you are pregnant, have a medical condition or an injury.</p>
+
+    <h2>3. Eligibility and accounts</h2>
+    <p>You must be at least 16 years old. You are responsible for keeping your password confidential and for activity
+      under your account. Provide accurate information so recommendations are appropriate for you.</p>
+
+    <h2>4. Plans, trials and payments</h2>
+    <ul>
+      <li>The Free plan is available at no cost. Premium features require a paid plan.</li>
+      <li>New accounts may receive a free Premium trial. When it ends you are moved to the Free plan automatically;
+        nothing is charged.</li>
+      <li>Paid plans are purchased for a fixed period (monthly or yearly) and <strong>do not renew automatically</strong>.
+        Paying again before the period ends extends it.</li>
+      <li>Payments are processed by Razorpay. We do not receive or store your card or bank details.</li>
+      <li>Prices are shown in INR and may change for future purchases; a period you have already paid for is not affected.</li>
+    </ul>
+
+    <h2>5. Refunds and cancellation</h2>
+    <p>Because plans don't auto-renew, there is nothing to cancel - simply don't renew. If you were charged in error or
+      a technical problem prevented you from using Premium, contact us at <a [href]="'mailto:' + email">{{ email }}</a>
+      within 7 days of payment and we will review your request. Approved refunds are returned to the original payment
+      method via Razorpay.</p>
+
+    <h2>6. Acceptable use</h2>
+    <p>Don't misuse the service: no attempts to access other users' data, disrupt the service, reverse engineer it,
+      or use it for unlawful purposes. We may suspend accounts that violate these Terms.</p>
+
+    <h2>7. Your content and data</h2>
+    <p>You own the data you enter. You give us permission to store and process it only to provide the service, as
+      described in our <a routerLink="/privacy">Privacy Policy</a>. You can delete your account at any time from
+      My Profile → Security.</p>
+
+    <h2>8. Availability and changes</h2>
+    <p>We work to keep FitTrack available but cannot guarantee uninterrupted service. We may update features and these
+      Terms; material changes will be notified in the app or by email.</p>
+
+    <h2>9. Limitation of liability</h2>
+    <p>To the extent permitted by law, FitTrack is provided "as is" and we are not liable for indirect or consequential
+      losses, or for injuries resulting from exercise or dietary choices. Our total liability is limited to the amount
+      you paid us in the 12 months before the claim.</p>
+
+    <h2>10. Governing law and contact</h2>
+    <p>These Terms are governed by the laws of India. Questions: <a [href]="'mailto:' + email">{{ email }}</a>.</p>
+  } @else {
+    <h1>Privacy Policy</h1>
+    <p class="ft-muted">Last updated: {{ updated }}</p>
+
+    <h2>1. Who we are</h2>
+    <p>{{ company }} operates FitTrack and is responsible for your personal data. Contact:
+      <a [href]="'mailto:' + email">{{ email }}</a>.</p>
+
+    <h2>2. What we collect</h2>
+    <ul>
+      <li><strong>Account:</strong> name, email address, password (stored only as a secure hash).</li>
+      <li><strong>Profile & fitness assessment:</strong> date of birth, gender, height, weight, goals, fitness level,
+        schedule, equipment, diet preference, allergies, injuries or limitations, activity level and sleep.</li>
+      <li><strong>Tracking data you enter:</strong> workouts, steps, water, sleep, body measurements, meals and photos you upload.</li>
+      <li><strong>Payments:</strong> plan, amount, status and Razorpay order/payment references. Card and bank details are
+        handled by Razorpay and never reach us.</li>
+      <li><strong>Technical:</strong> sign-in times, device/browser information for security, and essential cookies.</li>
+    </ul>
+
+    <h2>3. Why we use it</h2>
+    <p>To provide and personalise the service (workout, step, water and nutrition guidance), keep your account secure,
+      process payments, send service emails (verification, password reset, receipts, reminders you set up) and improve
+      FitTrack. We do not sell your data and do not use your health information for advertising.</p>
+
+    <h2>4. Consent and sensitive information</h2>
+    <p>Fitness and health-related details are processed with your consent, given when you create an account and
+      complete the assessment, in line with India's Digital Personal Data Protection Act, 2023. You may withdraw consent
+      by deleting your account.</p>
+
+    <h2>5. Sharing</h2>
+    <p>We share data only with service providers needed to run FitTrack (hosting, email delivery, Razorpay for payments),
+      under contracts that require them to protect it, or when required by law.</p>
+
+    <h2>6. Retention</h2>
+    <p>We keep your data while your account is active. When you delete your account, your personal and fitness data and
+      uploaded files are deleted. Payment records may be retained where required by tax or accounting law.</p>
+
+    <h2>7. Your rights</h2>
+    <p>You can access and correct your data in the app, delete your account from My Profile → Security, and contact us
+      to ask questions or raise a grievance at <a [href]="'mailto:' + email">{{ email }}</a>.</p>
+
+    <h2>8. Security</h2>
+    <p>Data is transmitted over HTTPS, passwords are hashed, session tokens are short-lived, and uploaded images are
+      re-processed to remove embedded location data. No system is perfectly secure; we will notify you of any breach as
+      required by law.</p>
+
+    <h2>9. Cookies and local storage</h2>
+    <p>We use one essential, http-only cookie to keep you signed in, and your browser's local storage to remember your
+      theme. We do not use advertising or tracking cookies.</p>
+
+    <h2>10. Children</h2>
+    <p>FitTrack is not intended for anyone under 16.</p>
+  }
+</article>

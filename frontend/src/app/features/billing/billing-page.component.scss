@@ -1,0 +1,35 @@
+.current { margin-bottom: 16px; }
+.current--premium {
+  background:
+    radial-gradient(90% 120% at 100% 0%, color-mix(in srgb, var(--mat-sys-tertiary-container) 70%, transparent), transparent 60%),
+    var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  .ft-muted { color: inherit; opacity: .85; }
+}
+.current__head { display: flex; justify-content: space-between; gap: 16px; }
+.current__head h2 { margin: 2px 0 6px; font: var(--mat-sys-headline-small); font-weight: 700; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.current__head p { margin: 0; max-width: 70ch; }
+.current__icon { width: 48px; height: 48px; font-size: 48px; opacity: .8; flex: none; }
+.eyebrow { margin: 0; font: var(--mat-sys-label-medium); text-transform: uppercase; letter-spacing: .06em; opacity: .8; }
+.chip { font: var(--mat-sys-label-medium); padding: 4px 10px; border-radius: 999px; background: var(--mat-sys-surface); color: var(--mat-sys-on-surface); }
+.current__features { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.current__features li { display: flex; align-items: center; gap: 6px; font: var(--mat-sys-body-medium); }
+.current__features mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+.alert { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 14px; border-radius: 12px; margin-bottom: 12px; }
+.alert span { flex: 1; min-width: 200px; }
+.alert--info { background: var(--mat-sys-secondary-container); color: var(--mat-sys-on-secondary-container); }
+.alert--error { background: var(--mat-sys-error-container); color: var(--mat-sys-on-error-container); }
+
+.plans { margin: 24px 0; }
+.plans__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.plans__head .ft-section-title { margin: 0; }
+.small { font: var(--mat-sys-body-small); margin-top: 12px; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; background: transparent; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.status { padding: 2px 8px; border-radius: 999px; font: var(--mat-sys-label-medium); }
+.status--paid { background: var(--mat-sys-primary-container); color: var(--mat-sys-on-primary-container); }
+.status--failed { background: var(--mat-sys-error-container); color: var(--mat-sys-on-error-container); }
+.status--created { background: var(--mat-sys-surface-container-highest); color: var(--mat-sys-on-surface-variant); }

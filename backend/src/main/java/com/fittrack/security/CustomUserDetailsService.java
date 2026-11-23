@@ -1,0 +1,26 @@
+package com.fittrack.security;
+
+import com.fittrack.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Locale;
+
+@Service
+@RequiredArgsConstructor
+public class CustomUserDetailsService implements UserDetailsService {
+
+    private final UserRepository userRepository;
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String email) {
+        return userRepository.findByEmail(email.trim().toLowerCase(Locale.ROOT))
+                .map(UserPrincipal::from)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+}
