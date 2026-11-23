@@ -1,0 +1,47 @@
+<div class="plans">
+  @for (plan of plans; track plan.code) {
+    <article class="plan" [class.plan--featured]="!plan.free" [class.plan--current]="isCurrent(plan)" [attr.aria-label]="plan.name + ' plan'">
+      @if (!plan.free) {
+        <span class="badge">Most popular</span>
+      }
+      <h3 class="plan__name">{{ plan.name }}</h3>
+      <p class="plan__desc">{{ plan.description }}</p>
+
+      <div class="plan__price">
+        @if (plan.free) {
+          <span class="amount">{{ 0 | money: plan.currency }}</span><span class="per">forever</span>
+        } @else {
+          <span class="amount">{{ price(plan) | money: plan.currency }}</span>
+          <span class="per">/ {{ cycle === 'YEARLY' ? 'year' : 'month' }}</span>
+        }
+      </div>
+      <p class="plan__sub">
+        @if (!plan.free && cycle === 'YEARLY') {
+          {{ perMonth(plan) | money: plan.currency }}/month billed yearly
+          @if (savingsPct(plan) > 0) { · <strong>save {{ savingsPct(plan) }}%</strong> }
+        } @else if (!plan.free) {
+          Billed monthly · no auto-renewal
+        } @else {
+          No card required
+        }
+      </p>
+
+      @if (mode === 'public') {
+        <a mat-flat-button class="cta" routerLink="/auth/register" [class.cta--tonal]="plan.free">{{ ctaLabel(plan) }}</a>
+      } @else {
+        <button mat-flat-button class="cta" type="button" [disabled]="ctaDisabled(plan)" (click)="choose.emit(plan)">
+          @if (busyPlanCode === plan.code) { <mat-spinner diameter="20" /> } @else { {{ ctaLabel(plan) }} }
+        </button>
+      }
+
+      <ul class="plan__features">
+        @for (c of core; track c) {
+          <li><mat-icon aria-hidden="true">check</mat-icon>{{ c }}</li>
+        }
+        @for (f of plan.features; track f.code) {
+          <li><mat-icon aria-hidden="true">check</mat-icon>{{ line(f) }}</li>
+        }
+      </ul>
+    </article>
+  }
+</div>

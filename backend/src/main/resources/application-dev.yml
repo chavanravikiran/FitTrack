@@ -1,0 +1,21 @@
+# Local development profile. Never use these values in production.
+spring:
+  datasource:
+    # Local PostgreSQL (pgAdmin) database "fittrack". Override with DB_URL / DB_USERNAME / DB_PASSWORD.
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/fittrack}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:root}
+
+app:
+  jwt:
+    # Dev-only key (random 384-bit). Production must supply its own JWT_SECRET.
+    secret: ${JWT_SECRET:tOCv8GcyxKTFpcoenkHLI2we2jhCQxr7WMwH2BXabq5hRe6yeJzNGAV85m3hblUy}
+  cookie:
+    secure: ${COOKIE_SECURE:false}
+  admin:
+    email: ${ADMIN_EMAIL:admin@gmail.com}
+    password: ${ADMIN_PASSWORD:Admin@123}
+
+logging:
+  level:
+    com.fittrack: DEBUG

@@ -1,0 +1,186 @@
+<div class="onboarding">
+  <header class="top">
+    <div class="logo"><mat-icon aria-hidden="true">bolt</mat-icon> FitTrack</div>
+    <button mat-button type="button" (click)="signOut()"><mat-icon>logout</mat-icon> Sign out</button>
+  </header>
+
+  <div class="intro">
+    <h1>Let's personalise your plan</h1>
+    <p>A few quick questions so your workouts, step target, water and nutrition guidance fit <em>you</em>. You can change any of this later.</p>
+  </div>
+
+  <mat-card appearance="outlined" class="card">
+    <mat-stepper [linear]="true" [orientation]="'vertical'" #stepper class="stepper">
+
+      <!-- 1. About you -->
+      <mat-step [stepControl]="aboutForm" label="About you">
+        <form [formGroup]="aboutForm" class="ft-form step" novalidate>
+          <mat-form-field appearance="outline">
+            <mat-label>Full name</mat-label>
+            <input matInput formControlName="fullName" autocomplete="name" required />
+            <mat-error>{{ aboutForm.controls.fullName | formError: 'Full name' }}</mat-error>
+          </mat-form-field>
+
+          <div class="ft-form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Date of birth</mat-label>
+              <input matInput [matDatepicker]="dobPicker" formControlName="dateOfBirth" [max]="maxDob" [min]="minDob" required placeholder="DD/MM/YYYY" />
+              <mat-datepicker-toggle matIconSuffix [for]="dobPicker" />
+              <mat-datepicker #dobPicker startView="multi-year" />
+              <mat-hint>You must be 16 or older</mat-hint>
+              <mat-error>{{ aboutForm.controls.dateOfBirth | formError: 'Date of birth' }}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Time zone</mat-label>
+              <input matInput formControlName="timeZone" [matAutocomplete]="tzAuto" required />
+              <mat-autocomplete #tzAuto="matAutocomplete">
+                @for (z of filteredZones$ | async; track z) {
+                  <mat-option [value]="z">{{ z }}</mat-option>
+                }
+              </mat-autocomplete>
+              <mat-hint>Used for reminders and daily records</mat-hint>
+              <mat-error>Choose a time zone from the list</mat-error>
+            </mat-form-field>
+          </div>
+
+          <label class="field-label" id="gender-label">Gender</label>
+          <mat-radio-group formControlName="gender" aria-labelledby="gender-label" class="radio-row">
+            @for (g of genders; track g.value) {
+              <mat-radio-button [value]="g.value">{{ g.label }}</mat-radio-button>
+            }
+          </mat-radio-group>
+          <p class="help">Only used to estimate your resting calorie needs (BMR). It never decides which exercises you get.</p>
+          @if (aboutForm.controls.gender.touched && aboutForm.controls.gender.invalid) {
+            <mat-error>Please choose an option</mat-error>
+          }
+
+          <div class="actions">
+            <button mat-flat-button matStepperNext type="button" (click)="aboutForm.markAllAsTouched()">Continue</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- 2. Body -->
+      <mat-step [stepControl]="bodyForm" label="Your body">
+        <form [formGroup]="bodyForm" class="ft-form step" novalidate>
+          <div class="body-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Height</mat-label>
+              <input matInput type="number" formControlName="heightCm" inputmode="decimal" min="90" max="250" required />
+              <span matTextSuffix>cm</span>
+              <mat-error>{{ bodyForm.controls.heightCm | formError: 'Height' }}</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Current weight</mat-label>
+              <input matInput type="number" formControlName="currentWeightKg" inputmode="decimal" step="0.1" required />
+              <span matTextSuffix>kg</span>
+              <mat-error>{{ bodyForm.controls.currentWeightKg | formError: 'Weight' }}</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Target weight</mat-label>
+              <input matInput type="number" formControlName="targetWeightKg" inputmode="decimal" step="0.1" required />
+              <span matTextSuffix>kg</span>
+              @if (minTarget) {
+                <mat-hint>Healthy minimum for your height: {{ minTarget }} kg</mat-hint>
+              }
+              <mat-error>{{ bodyForm.controls.targetWeightKg | formError: 'Target weight' }}</mat-error>
+            </mat-form-field>
+          </div>
+
+          @if (bmi !== null) {
+            <div class="insight" role="status">
+              <mat-icon aria-hidden="true">insights</mat-icon>
+              <div>
+                <strong>Your BMI is about {{ bmi }}</strong>, which is {{ bmiCategory }}.
+                @if (timelineWeeks) {
+                  At a safe, sustainable pace your target could take roughly <strong>{{ timelineWeeks }} weeks</strong>.
+                  Slow and steady progress is easier to keep.
+                }
+                <span class="help block">BMI is a rough screening number - it doesn't account for muscle mass or body shape.</span>
+              </div>
+            </div>
+          }
+
+          <div class="actions">
+            <button mat-button matStepperPrevious type="button">Back</button>
+            <button mat-flat-button matStepperNext type="button" (click)="bodyForm.markAllAsTouched()">Continue</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- 3. Goal & experience -->
+      <mat-step [completed]="goalsStepValid" label="Goal & experience">
+        <div class="step">
+          <ft-assessment-form [form]="assessmentForm" section="goals" />
+          <div class="actions">
+            <button mat-button matStepperPrevious type="button">Back</button>
+            <button mat-flat-button matStepperNext type="button" (click)="touchGoals()">Continue</button>
+          </div>
+        </div>
+      </mat-step>
+
+      <!-- 4. Schedule & equipment -->
+      <mat-step [completed]="scheduleStepValid" label="Schedule & equipment">
+        <div class="step">
+          <ft-assessment-form [form]="assessmentForm" section="schedule" />
+          <div class="actions">
+            <button mat-button matStepperPrevious type="button">Back</button>
+            <button mat-flat-button matStepperNext type="button">Continue</button>
+          </div>
+        </div>
+      </mat-step>
+
+      <!-- 5. Health & lifestyle -->
+      <mat-step [completed]="healthStepValid" label="Health & lifestyle">
+        <div class="step">
+          <ft-assessment-form [form]="assessmentForm" section="health" />
+          <div class="actions">
+            <button mat-button matStepperPrevious type="button">Back</button>
+            <button mat-flat-button matStepperNext type="button" (click)="touchHealth()">Review</button>
+          </div>
+        </div>
+      </mat-step>
+
+      <!-- 6. Review -->
+      <mat-step label="Review & finish">
+        <div class="step">
+          <dl class="review">
+            <div><dt>Name</dt><dd>{{ aboutForm.controls.fullName.value }}</dd></div>
+            <div><dt>Gender</dt><dd>{{ label(opts.gender, aboutForm.controls.gender.value) }}</dd></div>
+            <div><dt>Height</dt><dd>{{ bodyForm.controls.heightCm.value }} cm</dd></div>
+            <div><dt>Weight → target</dt><dd>{{ bodyForm.controls.currentWeightKg.value }} → {{ bodyForm.controls.targetWeightKg.value }} kg</dd></div>
+            <div><dt>Goal</dt><dd>{{ label(opts.goal, assessmentForm.controls.primaryGoal.value) }}</dd></div>
+            <div><dt>Experience</dt><dd>{{ label(opts.level, assessmentForm.controls.fitnessLevel.value) }}</dd></div>
+            <div><dt>Location</dt><dd>{{ label(opts.location, assessmentForm.controls.workoutLocation.value) }}</dd></div>
+            <div><dt>Training days</dt><dd>{{ selectedDays }} · {{ assessmentForm.controls.sessionMinutes.value }} min</dd></div>
+            <div><dt>Diet</dt><dd>{{ label(opts.diet, assessmentForm.controls.dietPreference.value) }}</dd></div>
+            <div><dt>Daily activity</dt><dd>{{ label(opts.activity, assessmentForm.controls.activityLevel.value) }}</dd></div>
+            <div><dt>Sleep</dt><dd>{{ assessmentForm.controls.sleepHours.value }} h</dd></div>
+            <div><dt>Limitations</dt><dd>{{ assessmentForm.controls.limitations.length || 'None' }}</dd></div>
+          </dl>
+
+          <ft-disclaimer />
+
+          <mat-checkbox [formControl]="acknowledge" class="ack">
+            I understand FitTrack gives general fitness guidance, not medical advice.
+          </mat-checkbox>
+          @if (acknowledge.touched && acknowledge.invalid) {
+            <mat-error>Please confirm to continue</mat-error>
+          }
+
+          @if (submitError) {
+            <div class="error" role="alert"><mat-icon>error</mat-icon> {{ submitError }}</div>
+          }
+
+          <div class="actions">
+            <button mat-button matStepperPrevious type="button">Back</button>
+            <button mat-flat-button type="button" (click)="submit()" [disabled]="submitting">
+              @if (submitting) { <mat-spinner diameter="20" /> } @else { <ng-container><mat-icon>check</mat-icon> Create my plan</ng-container> }
+            </button>
+          </div>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  </mat-card>
+</div>

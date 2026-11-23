@@ -1,0 +1,101 @@
+<ft-page-header title="Subscription" icon="workspace_premium" subtitle="Your plan, upgrades and payment history." />
+
+@if (subscription) {
+  <mat-card appearance="outlined" class="ft-card current" [class.current--premium]="subscription.premium">
+    <div class="current__head">
+      <div>
+        <p class="eyebrow">Current plan</p>
+        <h2>{{ subscription.planName }} <span class="chip">{{ statusLabel }}</span></h2>
+        @if (subscription.currentPeriodEnd) {
+          <p class="ft-muted">
+            {{ subscription.status === 'TRIALING' ? 'Trial ends' : 'Active until' }}
+            <strong>{{ subscription.currentPeriodEnd | date: 'mediumDate' }}</strong>
+            ({{ subscription.daysRemaining }} day{{ subscription.daysRemaining === 1 ? '' : 's' }} left).
+            @if (subscription.status === 'TRIALING') { After that you'll move to the Free plan - nothing is charged. }
+            @else { Plans don't renew automatically - extend any time. }
+          </p>
+        } @else {
+          <p class="ft-muted">Free forever. Upgrade any time for more features.</p>
+        }
+      </div>
+      <mat-icon class="current__icon" aria-hidden="true">{{ subscription.premium ? 'workspace_premium' : 'person' }}</mat-icon>
+    </div>
+    <ul class="current__features">
+      @for (f of subscription.features; track f.code) {
+        <li><mat-icon aria-hidden="true">check_circle</mat-icon>{{ line(f) }}</li>
+      }
+    </ul>
+  </mat-card>
+}
+
+@if (auth.user$ | async; as user) {
+  @if (!user.emailVerified) {
+    <div class="alert alert--info" role="status">
+      <mat-icon aria-hidden="true">mark_email_unread</mat-icon>
+      <span>Verify your email address to enable upgrades and receipts.</span>
+      <button mat-button type="button" (click)="resendVerification()" [disabled]="resending">Resend email</button>
+    </div>
+  }
+}
+@if (config && !config.paymentsEnabled) {
+  <div class="alert alert--info" role="status">
+    <mat-icon aria-hidden="true">info</mat-icon>
+    <span>Online payments aren't switched on yet. Contact support if you'd like Premium access.</span>
+  </div>
+}
+@if (error) {
+  <div class="alert alert--error" role="alert"><mat-icon aria-hidden="true">error</mat-icon><span>{{ error }}</span></div>
+}
+
+<section class="plans">
+  <div class="plans__head">
+    <h2 class="ft-section-title">Plans</h2>
+    <mat-button-toggle-group [(value)]="cycle" aria-label="Billing period">
+      <mat-button-toggle value="MONTHLY">Monthly</mat-button-toggle>
+      <mat-button-toggle value="YEARLY">Yearly</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  @if (plans.length) {
+    <ft-plan-cards [plans]="plans" [cycle]="cycle" mode="app" [currentPlanCode]="subscription?.planCode ?? null"
+                   [canRenew]="canRenew" [busyPlanCode]="busyPlanCode" [paymentsEnabled]="config?.paymentsEnabled ?? false"
+                   (choose)="upgrade($event)" />
+  } @else {
+    <mat-progress-bar mode="indeterminate" />
+  }
+  <p class="ft-muted small">Secure payments by Razorpay (UPI, cards, net banking, wallets). Prices in INR.
+    See <a routerLink="/terms">Terms</a> for refunds.</p>
+</section>
+
+<mat-card appearance="outlined" class="ft-card">
+  <h2 class="ft-section-title">Payment history</h2>
+  @if (payments.length) {
+    <div class="table-wrap">
+      <table mat-table [dataSource]="payments">
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let p">{{ (p.paidAt ?? p.createdAt) | date: 'mediumDate' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="plan">
+          <th mat-header-cell *matHeaderCellDef>Plan</th>
+          <td mat-cell *matCellDef="let p">{{ p.planName }} · {{ p.billingCycle === 'YEARLY' ? '1 year' : '1 month' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>Amount</th>
+          <td mat-cell *matCellDef="let p">{{ p.amountMinor | money: p.currency }}</td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let p"><span class="status" [class]="'status--' + p.status.toLowerCase()">{{ p.status === 'CREATED' ? 'Not completed' : (p.status | titlecase) }}</span></td>
+        </ng-container>
+        <ng-container matColumnDef="reference">
+          <th mat-header-cell *matHeaderCellDef>Reference</th>
+          <td mat-cell *matCellDef="let p" class="mono">{{ p.providerPaymentId ?? p.providerOrderId }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="paymentColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: paymentColumns"></tr>
+      </table>
+    </div>
+  } @else {
+    <p class="ft-muted">No payments yet.</p>
+  }
+</mat-card>

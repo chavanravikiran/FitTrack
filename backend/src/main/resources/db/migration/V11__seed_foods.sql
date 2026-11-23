@@ -1,0 +1,105 @@
+-- =====================================================================
+-- V11: Food database seed - common Indian and everyday foods.
+-- Values are approximate, per typical household serving (home-style cooking,
+-- moderate oil), compiled from public nutrition tables. Estimates only.
+-- =====================================================================
+
+INSERT INTO nutrition_foods (name, category, diet_type, serving_qty, serving_unit, calories, protein_g, carbs_g, fat_g, is_system)
+SELECT v.name, v.category, v.diet, v.qty, v.unit, v.kcal, v.p, v.c, v.f, TRUE
+FROM (VALUES
+-- Grains & breakfast
+('Chapati / Roti (whole wheat)', 'GRAINS', 'VEGAN', 1, 'piece', 112, 3.2, 18.6, 2.7),
+('Phulka (no oil)', 'GRAINS', 'VEGAN', 1, 'piece', 80, 2.6, 15.6, 0.6),
+('Plain Paratha', 'GRAINS', 'VEGETARIAN', 1, 'piece', 260, 5.0, 36.0, 10.0),
+('Aloo Paratha', 'GRAINS', 'VEGETARIAN', 1, 'piece', 300, 6.0, 42.0, 12.0),
+('Ragi Roti', 'GRAINS', 'VEGAN', 1, 'piece', 100, 2.5, 20.0, 1.0),
+('White Rice (cooked)', 'GRAINS', 'VEGAN', 1, 'cup', 195, 4.0, 43.0, 0.4),
+('Brown Rice (cooked)', 'GRAINS', 'VEGAN', 1, 'cup', 170, 3.8, 35.0, 1.4),
+('Jeera Rice', 'GRAINS', 'VEGAN', 1, 'cup', 240, 4.5, 44.0, 5.0),
+('Vegetable Pulao', 'PREPARED', 'VEGAN', 1, 'cup', 250, 5.5, 42.0, 6.5),
+('Chicken Biryani', 'PREPARED', 'NON_VEGETARIAN', 1, 'cup', 330, 17.0, 38.0, 12.0),
+('Veg Biryani', 'PREPARED', 'VEGETARIAN', 1, 'cup', 280, 6.0, 44.0, 9.0),
+('Poha', 'GRAINS', 'VEGAN', 1, 'plate', 250, 5.0, 42.0, 7.0),
+('Upma', 'GRAINS', 'VEGETARIAN', 1, 'bowl', 250, 6.0, 38.0, 8.0),
+('Idli', 'GRAINS', 'VEGAN', 1, 'piece', 58, 2.0, 12.0, 0.2),
+('Plain Dosa', 'GRAINS', 'VEGAN', 1, 'piece', 170, 4.0, 29.0, 4.0),
+('Masala Dosa', 'PREPARED', 'VEGETARIAN', 1, 'piece', 350, 7.0, 50.0, 13.0),
+('Oats (cooked with water)', 'GRAINS', 'VEGAN', 1, 'bowl', 150, 5.3, 27.0, 2.7),
+('Oats (cooked with milk)', 'GRAINS', 'VEGETARIAN', 1, 'bowl', 250, 11.0, 35.0, 7.0),
+('Daliya (broken wheat)', 'GRAINS', 'VEGAN', 1, 'bowl', 180, 6.0, 35.0, 1.5),
+('Besan Chilla', 'GRAINS', 'VEGAN', 1, 'piece', 150, 7.0, 18.0, 5.0),
+('Moong Dal Chilla', 'GRAINS', 'VEGAN', 1, 'piece', 130, 8.0, 17.0, 3.5),
+('Whole Wheat Bread', 'GRAINS', 'VEGAN', 1, 'slice', 70, 3.5, 12.0, 1.0),
+-- Pulses & legumes
+('Dal Tadka (toor)', 'PULSES', 'VEGETARIAN', 1, 'bowl', 180, 9.0, 24.0, 5.0),
+('Moong Dal', 'PULSES', 'VEGAN', 1, 'bowl', 160, 10.0, 22.0, 3.5),
+('Masoor Dal', 'PULSES', 'VEGAN', 1, 'bowl', 165, 10.0, 23.0, 3.5),
+('Chana Masala', 'PULSES', 'VEGAN', 1, 'bowl', 240, 10.0, 30.0, 8.0),
+('Rajma', 'PULSES', 'VEGAN', 1, 'bowl', 230, 10.0, 32.0, 6.0),
+('Sambar', 'PULSES', 'VEGAN', 1, 'bowl', 130, 6.0, 18.0, 3.5),
+('Moong Sprouts Salad', 'PULSES', 'VEGAN', 1, 'bowl', 105, 7.5, 18.0, 0.6),
+('Boiled Chickpeas', 'PULSES', 'VEGAN', 1, 'cup', 270, 14.5, 45.0, 4.2),
+('Soya Chunks (cooked)', 'PULSES', 'VEGAN', 1, 'cup', 172, 26.0, 16.5, 0.3),
+('Tofu', 'PULSES', 'VEGAN', 100, 'g', 145, 15.5, 3.5, 8.7),
+-- Dairy
+('Paneer', 'DAIRY', 'VEGETARIAN', 100, 'g', 265, 18.0, 6.0, 20.0),
+('Palak Paneer', 'PREPARED', 'VEGETARIAN', 1, 'bowl', 280, 13.0, 10.0, 21.0),
+('Paneer Bhurji', 'PREPARED', 'VEGETARIAN', 1, 'bowl', 260, 15.0, 6.0, 20.0),
+('Curd / Dahi (toned milk)', 'DAIRY', 'VEGETARIAN', 1, 'bowl', 90, 5.0, 7.0, 4.5),
+('Greek Yogurt (plain)', 'DAIRY', 'VEGETARIAN', 100, 'g', 60, 10.0, 3.6, 0.4),
+('Toned Milk', 'DAIRY', 'VEGETARIAN', 1, 'glass', 145, 7.8, 11.8, 7.5),
+('Buttermilk (chaas)', 'BEVERAGES', 'VEGETARIAN', 1, 'glass', 40, 2.0, 4.0, 1.5),
+('Sweet Lassi', 'BEVERAGES', 'VEGETARIAN', 1, 'glass', 220, 7.0, 34.0, 6.0),
+('Ghee', 'DAIRY', 'VEGETARIAN', 1, 'tsp', 45, 0.0, 0.0, 5.0),
+-- Eggs
+('Boiled Egg', 'EGGS', 'EGGETARIAN', 1, 'large', 78, 6.3, 0.6, 5.3),
+('Egg White (boiled)', 'EGGS', 'EGGETARIAN', 1, 'large', 17, 3.6, 0.2, 0.1),
+('Omelette (2 eggs)', 'EGGS', 'EGGETARIAN', 1, 'serving', 190, 13.0, 2.0, 14.0),
+('Egg Bhurji (2 eggs)', 'EGGS', 'EGGETARIAN', 1, 'serving', 220, 13.0, 4.0, 17.0),
+-- Meat & seafood
+('Grilled Chicken Breast', 'MEAT', 'NON_VEGETARIAN', 100, 'g', 165, 31.0, 0.0, 3.6),
+('Chicken Curry', 'PREPARED', 'NON_VEGETARIAN', 1, 'bowl', 300, 25.0, 8.0, 19.0),
+('Tandoori Chicken', 'MEAT', 'NON_VEGETARIAN', 2, 'pieces', 260, 34.0, 4.0, 12.0),
+('Mutton Curry', 'PREPARED', 'NON_VEGETARIAN', 1, 'bowl', 380, 26.0, 7.0, 28.0),
+('Fish Curry', 'SEAFOOD', 'NON_VEGETARIAN', 1, 'bowl', 230, 22.0, 6.0, 13.0),
+('Grilled Fish', 'SEAFOOD', 'NON_VEGETARIAN', 100, 'g', 130, 24.0, 0.0, 3.5),
+('Prawns (cooked)', 'SEAFOOD', 'NON_VEGETARIAN', 100, 'g', 100, 24.0, 0.2, 0.3),
+-- Fruits
+('Banana', 'FRUITS', 'VEGAN', 1, 'medium', 105, 1.3, 27.0, 0.4),
+('Apple', 'FRUITS', 'VEGAN', 1, 'medium', 95, 0.5, 25.0, 0.3),
+('Orange', 'FRUITS', 'VEGAN', 1, 'medium', 62, 1.2, 15.4, 0.2),
+('Papaya', 'FRUITS', 'VEGAN', 1, 'cup', 62, 0.7, 15.7, 0.4),
+('Mango', 'FRUITS', 'VEGAN', 1, 'cup', 99, 1.4, 24.7, 0.6),
+('Guava', 'FRUITS', 'VEGAN', 1, 'medium', 68, 2.6, 14.3, 1.0),
+('Watermelon', 'FRUITS', 'VEGAN', 1, 'cup', 46, 0.9, 11.5, 0.2),
+('Pomegranate', 'FRUITS', 'VEGAN', 0.5, 'cup', 72, 1.5, 16.3, 1.0),
+('Grapes', 'FRUITS', 'VEGAN', 1, 'cup', 104, 1.1, 27.0, 0.2),
+-- Vegetables
+('Mixed Vegetable Sabzi', 'VEGETABLES', 'VEGAN', 1, 'bowl', 150, 4.0, 15.0, 8.0),
+('Aloo Gobi', 'VEGETABLES', 'VEGAN', 1, 'bowl', 180, 4.0, 20.0, 9.5),
+('Bhindi Masala', 'VEGETABLES', 'VEGAN', 1, 'bowl', 150, 3.0, 12.0, 10.0),
+('Palak Sabzi', 'VEGETABLES', 'VEGAN', 1, 'bowl', 110, 4.5, 8.0, 7.0),
+('Green Salad', 'VEGETABLES', 'VEGAN', 1, 'bowl', 25, 1.2, 5.0, 0.2),
+('Cucumber', 'VEGETABLES', 'VEGAN', 1, 'cup', 16, 0.7, 3.8, 0.1),
+('Boiled Sweet Potato', 'VEGETABLES', 'VEGAN', 1, 'medium', 112, 2.0, 26.0, 0.1),
+-- Nuts & seeds
+('Almonds', 'NUTS_SEEDS', 'VEGAN', 10, 'pieces', 70, 2.5, 2.5, 6.0),
+('Roasted Peanuts', 'NUTS_SEEDS', 'VEGAN', 30, 'g', 170, 7.5, 5.0, 14.5),
+('Walnuts', 'NUTS_SEEDS', 'VEGAN', 14, 'g', 92, 2.1, 1.9, 9.2),
+('Peanut Butter', 'NUTS_SEEDS', 'VEGAN', 1, 'tbsp', 95, 3.5, 3.5, 8.0),
+('Chia Seeds', 'NUTS_SEEDS', 'VEGAN', 1, 'tbsp', 58, 2.0, 5.0, 3.7),
+('Flax Seeds', 'NUTS_SEEDS', 'VEGAN', 1, 'tbsp', 53, 1.8, 2.9, 4.2),
+-- Snacks
+('Roasted Chana', 'SNACKS', 'VEGAN', 30, 'g', 110, 6.5, 18.0, 1.8),
+('Roasted Makhana', 'SNACKS', 'VEGAN', 1, 'cup', 104, 2.9, 23.0, 0.1),
+('Dhokla', 'SNACKS', 'VEGETARIAN', 2, 'pieces', 100, 4.0, 15.0, 2.5),
+('Samosa', 'SNACKS', 'VEGETARIAN', 1, 'piece', 260, 4.0, 30.0, 14.0),
+('Vegetable Pakora', 'SNACKS', 'VEGAN', 4, 'pieces', 200, 4.0, 18.0, 13.0),
+('Bhel Puri', 'SNACKS', 'VEGAN', 1, 'plate', 250, 6.0, 40.0, 7.0),
+('Marie Biscuits', 'SNACKS', 'VEGETARIAN', 2, 'pieces', 60, 1.0, 10.0, 2.0),
+-- Beverages & other
+('Tea with Milk and Sugar', 'BEVERAGES', 'VEGETARIAN', 1, 'cup', 70, 1.5, 10.0, 2.2),
+('Black Coffee', 'BEVERAGES', 'VEGAN', 1, 'cup', 2, 0.3, 0.0, 0.0),
+('Coconut Water', 'BEVERAGES', 'VEGAN', 1, 'glass', 46, 1.7, 9.0, 0.5),
+('Whey Protein (1 scoop)', 'OTHER', 'VEGETARIAN', 30, 'g', 120, 24.0, 3.0, 1.5)
+) AS v(name, category, diet, qty, unit, kcal, p, c, f);
